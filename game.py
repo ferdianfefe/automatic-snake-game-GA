@@ -96,7 +96,7 @@ class Game:
         while True:
             if termination:
                 for i in self.players_ids:
-                    if len(self.snakes[0] - self.turn/20 <= 0):
+                    if len(self.snakes[0]) - self.turn/20 <= 0:
                         self.players_ids.remove(i)
                         # remove return if more than 1 snakes
                         return -2
