@@ -5,7 +5,6 @@ import math
 
 
 class RandomPlayer:
-
     def __init__(self, i):
         self.i = i
 
@@ -15,7 +14,17 @@ class RandomPlayer:
 
 
 class GeneticPlayer:
-    def __init__(self, pop_size, num_generations, num_trails, window_size, hidden_size, board_size, mutation_chance=0.1, mutation_size=0.1):
+    def __init__(
+        self,
+        pop_size,
+        num_generations,
+        num_trails,
+        window_size,
+        hidden_size,
+        board_size,
+        mutation_chance=0.1,
+        mutation_size=0.1,
+    ):
         # population size
         self.pop_size = pop_size
         self.num_generations = num_generations
@@ -31,44 +40,75 @@ class GeneticPlayer:
 
         # brain to play games
         self.current_brain = None
-        self.pop = [self.generate_brain(
-            self.window_size**2, self.hidden_size, len(MOVES)) for _ in range(self.pop_size)]
+        self.pop = [
+            self.generate_brain(self.window_size**2, self.hidden_size, len(MOVES))
+            for _ in range(self.pop_size)
+        ]
 
     def generate_brain(self, input_size, hidden_size, output_size):
         hidden_layer1 = np.array(
-            [[rand.uniform(-1, 1) for _ in range(input_size+1)] for _ in range(hidden_size)])
+            [
+                [rand.uniform(-1, 1) for _ in range(input_size + 1)]
+                for _ in range(hidden_size)
+            ]
+        )
         hidden_layer2 = np.array(
-            [[rand.uniform(-1, 1) for _ in range(hidden_size+1)] for _ in range(hidden_size)])
+            [
+                [rand.uniform(-1, 1) for _ in range(hidden_size + 1)]
+                for _ in range(hidden_size)
+            ]
+        )
         output_layer = np.array(
-            [[rand.uniform(-1, 1) for _ in range(hidden_size+1)] for _ in range(output_size)])
-        return[hidden_layer1, hidden_layer2, output_layer]
+            [
+                [rand.uniform(-1, 1) for _ in range(hidden_size + 1)]
+                for _ in range(output_size)
+            ]
+        )
+        return [hidden_layer1, hidden_layer2, output_layer]
 
     def get_move(self, board, snake):
-        input_vector = self.process_board(board, snake[-1][0], snake[-1][1], snake[-2][0], snake[-2][1]) 
+        input_vector = self.process_board(
+            board, snake[-1][0], snake[-1][1], snake[-2][0], snake[-2][1]
+        )
         hidden_layer1 = self.current_brain[0]
         hidden_layer2 = self.current_brain[1]
         output_layer = self.current_brain[2]
 
         # forward propagation, dot product
-        hidden_result1 = np.array([math.tanh(np.dot(input_vector, hidden_layer1[i]))
-                                  for i in range(hidden_layer1.shape[0])] + [1])  # [1] for bias
-        hidden_result2 = np.array([math.tanh(np.dot(hidden_result1, hidden_layer2[i]))
-                                   for i in range(hidden_layer2.shape[0])] + [1])  # [1] for bias
-        output_result = np.array([math.tanh(np.dot(hidden_result2, output_layer[i]))
-                                  for i in range(output_layer.shape[0])]) 
+        hidden_result1 = np.array(
+            [
+                math.tanh(np.dot(input_vector, hidden_layer1[i]))
+                for i in range(hidden_layer1.shape[0])
+            ]
+            + [1]
+        )  # [1] for bias
+        hidden_result2 = np.array(
+            [
+                math.tanh(np.dot(hidden_result1, hidden_layer2[i]))
+                for i in range(hidden_layer2.shape[0])
+            ]
+            + [1]
+        )  # [1] for bias
+        output_result = np.array(
+            [
+                math.tanh(np.dot(hidden_result2, output_layer[i]))
+                for i in range(output_layer.shape[0])
+            ]
+        )
 
         max_index = np.argmax(output_result)
         return MOVES[max_index]
 
     def process_board(self, board, x1, y1, x2, y2):
         # x & y is the snake position
-        input_vector = [[0 for _ in range(self.window_size)]
-                        for _ in range(self.window_size)]
+        input_vector = [
+            [0 for _ in range(self.window_size)] for _ in range(self.window_size)
+        ]
 
         for i in range(self.window_size):
             for j in range(self.window_size):
-                ii = x1 + i - self.window_size//2
-                jj = y1 + j - self.window_size//2
+                ii = x1 + i - self.window_size // 2
+                jj = y1 + j - self.window_size // 2
 
                 # check if out of bounds
                 if ii < 0 or jj < 0 or ii >= self.board_size or jj >= self.board_size:
@@ -92,9 +132,10 @@ class GeneticPlayer:
         for brain in top_25:
             new_brain = self.mutate(brain)
             new_pop.append(new_brain)
-        for _ in range(self.pop_size//2):
-            new_pop.append(self.generate_brain(
-                self.window_size**2, self.hidden_size, len(MOVES)))
+        for _ in range(self.pop_size // 2):
+            new_pop.append(
+                self.generate_brain(self.window_size**2, self.hidden_size, len(MOVES))
+            )
         return new_pop
 
     def mutate(self, brain):
@@ -104,8 +145,7 @@ class GeneticPlayer:
             for i in range(new_layer.shape[0]):
                 for j in range(new_layer.shape[1]):
                     if rand.uniform(0, 1) < self.mutation_chance:
-                        new_layer[i][j] += (rand.uniform(-1, 1)
-                                            * self.mutation_size)
+                        new_layer[i][j] += rand.uniform(-1, 1) * self.mutation_size
             new_brain.append(new_layer)
         return new_brain
 
@@ -119,6 +159,7 @@ class GeneticPlayer:
                 game = Game(self.board_size, 1, [self])
                 outcome = game.play(False, termination=True)
                 score = len(game.snakes[0])
+                scores[i] += score
 
                 if outcome == 0:
                     print("Snake", i, "succeeded")
@@ -127,11 +168,11 @@ class GeneticPlayer:
                     print(max_score, "at ID", i)
 
         top_25_indexes = list(np.argsort(scores))[
-            3*(self.pop_size//4): self.pop_size]
+            3 * (self.pop_size // 4) : self.pop_size
+        ]
 
         print(scores)
-        top_25 = [self.pop[i]
-                  for i in top_25_indexes][::-1]  # reversing the list
+        top_25 = [self.pop[i] for i in top_25_indexes][::-1]  # reversing the list
         self.pop = self.reproduce(top_25)
 
     def evolve_pop(self):
@@ -139,11 +180,19 @@ class GeneticPlayer:
             self.one_generation()
             print("gen", i)
 
-        key = input("press any key to display board")
-        for brain in self.pop:
-            self.display = True
-            self.current_brain = brain
-            game = Game(self.board_size, 1, [self], display=True)
-            gui = Gui(game, 800)
-            game.play(True, termination=True)
-            print("snake length", len(game.snakes[0]))
+        # key = input("press any key to display board")
+        # for brain in self.pop:
+        #     self.display = True
+        #     self.current_brain = brain
+        #     game = Game(self.board_size, 1, [self], display=True)
+        #     gui = Gui(game, 800)
+        #     game.play(True, termination=True)
+        #     print("snake length", len(game.snakes[0]))
+
+        # self.display = True
+        self.current_brain = self.pop[0]
+        game = Game(self.board_size, 1, [self], display=False)
+        # gui = Gui(game, 800)
+        game.play(False, termination=True)
+        # print("snake length", len(game.snakes[0]))
+        return len(game.snakes[0])
