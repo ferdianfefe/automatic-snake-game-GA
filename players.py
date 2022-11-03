@@ -159,6 +159,7 @@ class GeneticPlayer:
                 game = Game(self.board_size, 1, [self])
                 outcome = game.play(False, termination=True)
                 score = len(game.snakes[0])
+                scores[i] += score
 
                 if outcome == 0:
                     print("Snake", i, "succeeded")
@@ -179,11 +180,19 @@ class GeneticPlayer:
             self.one_generation()
             print("gen", i)
 
-        key = input("press any key to display board")
-        for brain in self.pop:
-            self.display = True
-            self.current_brain = brain
-            game = Game(self.board_size, 1, [self], display=True)
-            gui = Gui(game, 800)
-            game.play(True, termination=True)
-            print("snake length", len(game.snakes[0]))
+        # key = input("press any key to display board")
+        # for brain in self.pop:
+        #     self.display = True
+        #     self.current_brain = brain
+        #     game = Game(self.board_size, 1, [self], display=True)
+        #     gui = Gui(game, 800)
+        #     game.play(True, termination=True)
+        #     print("snake length", len(game.snakes[0]))
+
+        # self.display = True
+        self.current_brain = self.pop[0]
+        game = Game(self.board_size, 1, [self], display=False)
+        # gui = Gui(game, 800)
+        game.play(False, termination=True)
+        # print("snake length", len(game.snakes[0]))
+        return len(game.snakes[0])

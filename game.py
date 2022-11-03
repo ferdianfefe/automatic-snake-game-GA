@@ -17,7 +17,7 @@ FOOD = 99
 
 class Game:
     def __init__(
-        self, size, num_snakes, players, gui=None, display=False, max_turns=100
+        self, size, num_snakes, players, gui=None, display=False, max_turns=200
     ):
         self.size = size
         self.num_snakes = num_snakes
@@ -315,7 +315,7 @@ class Game:
         while True:
             if termination:
                 for i in self.players_ids:
-                    if len(self.snakes[0]) - self.turn / 20 <= 0:
+                    if (len(self.snakes[0]) - self.turn / 20) <= 0:
                         self.players_ids.remove(i)
                         # remove return if more than 1 snakes
                         return -2
