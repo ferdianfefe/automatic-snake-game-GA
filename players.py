@@ -25,7 +25,7 @@ class GeneticPlayer:
         mutation_chance=0.1,
         mutation_size=0.1,
         crossover_chance=0.7,
-        crossover_alpha=0.7
+        crossover_alpha=0.7,
     ):
         # population size
         self.pop_size = pop_size
@@ -45,8 +45,7 @@ class GeneticPlayer:
         # brain to play games
         self.current_brain = None
         self.pop = [
-            self.generate_brain(self.window_size**2,
-                                self.hidden_size, len(MOVES))
+            self.generate_brain(self.window_size**2, self.hidden_size, len(MOVES))
             for _ in range(self.pop_size)
         ]
 
@@ -141,8 +140,7 @@ class GeneticPlayer:
         new_pop.extend(crossover_children)
         for _ in range(self.pop_size // 2 - len(crossover_children)):
             new_pop.append(
-                self.generate_brain(self.window_size**2,
-                                    self.hidden_size, len(MOVES))
+                self.generate_brain(self.window_size**2, self.hidden_size, len(MOVES))
             )
         return new_pop
 
@@ -153,8 +151,7 @@ class GeneticPlayer:
             for i in range(new_layer.shape[0]):
                 for j in range(new_layer.shape[1]):
                     if rand.uniform(0, 1) < self.mutation_chance:
-                        new_layer[i][j] += rand.uniform(-1, 1) * \
-                            self.mutation_size
+                        new_layer[i][j] += rand.uniform(-1, 1) * self.mutation_size
             new_brain.append(new_layer)
         return new_brain
 
@@ -169,17 +166,22 @@ class GeneticPlayer:
                 break
 
             child1 = np.copy(selected_parents[i])
-            child2 = np.copy(selected_parents[i+1])
+            child2 = np.copy(selected_parents[i + 1])
 
             for x in range(3):
                 y = rand.randint(0, selected_parents[i][x].shape[0] - 1)
                 z = rand.randint(0, selected_parents[i][x].shape[1] - 1)
 
-                child1[x][y][z] = selected_parents[i + 1][x][y][z] * self.crossover_alpha + \
-                    selected_parents[i][x][y][z] * (1-self.crossover_alpha)
-                child2[x][y][z] = selected_parents[i][x][y][z] * self.crossover_alpha + \
-                    selected_parents[i + 1][x][y][z] * \
-                    (1 - self.crossover_alpha)
+                child1[x][y][z] = selected_parents[i + 1][x][y][
+                    z
+                ] * self.crossover_alpha + selected_parents[i][x][y][z] * (
+                    1 - self.crossover_alpha
+                )
+                child2[x][y][z] = selected_parents[i][x][y][
+                    z
+                ] * self.crossover_alpha + selected_parents[i + 1][x][y][z] * (
+                    1 - self.crossover_alpha
+                )
             children.append(child1)
             children.append(child2)
         return children
@@ -203,12 +205,11 @@ class GeneticPlayer:
                     print(max_score, "at ID", i)
 
         top_25_indexes = list(np.argsort(scores))[
-            3 * (self.pop_size // 4): self.pop_size
+            3 * (self.pop_size // 4) : self.pop_size
         ]
 
         print(scores)
-        top_25 = [self.pop[i]
-                  for i in top_25_indexes][::-1]  # reversing the list
+        top_25 = [self.pop[i] for i in top_25_indexes][::-1]  # reversing the list
         self.pop = self.reproduce(top_25)
 
     def evolve_pop(self):
@@ -216,7 +217,7 @@ class GeneticPlayer:
             self.one_generation()
             print("gen", i)
 
-        # key = input("press any key to display board")
+        key = input("press any key to display board")
         # for brain in self.pop:
         #     self.display = True
         #     self.current_brain = brain
@@ -225,10 +226,10 @@ class GeneticPlayer:
         #     game.play(True, termination=True)
         #     print("snake length", len(game.snakes[0]))
 
-        # self.display = True
+        self.display = True
         self.current_brain = self.pop[0]
         game = Game(self.board_size, 1, [self], display=False)
-        # gui = Gui(game, 800)
-        game.play(False, termination=True)
-        # print("snake length", len(game.snakes[0]))
-        return len(game.snakes[0])
+        gui = Gui(game, 800)
+        game.play(True, termination=True)
+        print("snake length", len(game.snakes[0]))
+        # return len(game.snakes[0])
