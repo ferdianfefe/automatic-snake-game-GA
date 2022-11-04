@@ -27,8 +27,8 @@ gen_player = GeneticPlayer(
     board_size,
     mutation_chance=0.3,
     mutation_size=0.3,
-    crossover_chance=0.6,
-    crossover_alpha=0.6,
+    crossover_chance=0.8,
+    crossover_alpha=0.8,
 )
 gen_player.evolve_pop()
 

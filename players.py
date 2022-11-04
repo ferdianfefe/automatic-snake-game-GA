@@ -215,6 +215,7 @@ class GeneticPlayer:
     def evolve_pop(self):
         for i in range(self.num_generations):
             self.one_generation()
+            # print(self.pop[0])
             print("gen", i)
 
         key = input("press any key to display board")
